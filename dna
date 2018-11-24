@@ -3,9 +3,11 @@
 
 namespace {
 
-    include_once __DIR__."/lib/dna.php";
+    require_once __DIR__."/lib/dna.php";
 
     use dna\core\dna;
 
     new dna($argv,__DIR__);
+
+
 }
