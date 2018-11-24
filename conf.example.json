@@ -1,0 +1,63 @@
+{
+    "package_name": "",
+    "package_version": "",
+    "package_uid":"{package_name}_{package_version}@{package_author_grup}.{package_author->author_nic}",
+    "package_author_grup": "",
+    "package_author" : {
+        "author_name":"" ,
+        "author_surname":"",
+        "author_nic":"",
+        "author_link":"",
+        "author_other":""
+    },
+    "package_owners":[
+        {
+            "owner_name":"a" ,
+            "owner_surname":"",
+            "owner_nic":"",
+            "owner_link":"",
+            "owner_other":""
+        },
+        {
+            "owner_name":"" ,
+            "owner_surname":"",
+            "owner_nic":"",
+            "owner_link":"",
+            "owner_other":""
+        }
+    ],
+    "package_copyright":"",
+    "package_licenseUrl":"",
+    "package_require_license_acceptance":false,
+    "package_websiteUrl":"",
+    "package_docUrl":"",
+    "package_node_extend":[
+        {
+            "node_ref":"",
+            "node_type":""
+        }
+    ],
+    "package_release_note":"",
+    "package_descripton":"",
+    "package_iconUrl":"",
+    "package_tag":"",
+    "package_depencies": [
+        {
+            "package_name":"",
+            "package_version":"",
+            "package_author" : {
+                "author_name":"" ,
+                "author_surname":"",
+                "author_nic":"",
+                "author_link":"",
+                "author_other":""
+            },
+            "node_name":"",
+            "node":{
+                "node_ref":"",
+                "node_type":""
+            }
+        }
+    ],
+    "package_release_date":""
+}
