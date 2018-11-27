@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "" > "dna.min"
-filesList=( "./lib/author.php" "./lib/owner.php" "./lib/node_extend.php" "./lib/package_conf.php"  "./lib/fileSystem.php" "./lib/dna.php" "./dna" );
+filesList=( "./lib/author.php" "./lib/owner.php" "./lib/node_extend.php" "./lib/package_conf.php"  "./lib/fileSystem.php" "./lib/dna.php"  "./lib/dna_messages.php"  "./lib/dna_conf.php"  "./dna" );
 
 for i in "${filesList[@]}"
 do
@@ -28,7 +28,7 @@ php -r '
     $handle = fopen("dna.min", "rb");
     $contents = fread($handle, filesize("dna.min"));
     fclose($handle);
-    $temp="<?php \n";
+    $temp="#!/usr/bin/php \n<?php \n ";
     $temp .= delete_all_between("require_once" ,";",$contents);
 
     $myfile = fopen("dna.min", "w") or die("Unable to open file!");

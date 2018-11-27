@@ -1,4 +1,4 @@
-#!/usr/bin/php7.2
+#!/usr/bin/php
 <?php
 
 namespace {
@@ -8,6 +8,4 @@ namespace {
     use dna\core\dna;
 
     new dna($argv,__DIR__);
-
-
 }

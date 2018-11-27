@@ -10,29 +10,104 @@ namespace dna\core {
     use dna\core\package_conf as PkConf;
     use dna\core\fileSystem as FS;
 
+    /**
+     * Class package_conf represents a conf.json
+     * @package dna\core
+     */
     class package_conf
     {
+        /**
+         * @var string name
+         */
         public $package_name = "";
+        /**
+         * @var string version
+         */
         public $package_version = "";
+        /**
+         * @var string uid [IS AUTO GENERATED] {package_name}_{package_version}@{package_author_group}.{package_author->author_nic}
+         */
         public $package_uid = "";
+        /**
+         * @var PkConf\author is a instance of author
+         */
         public $package_author;
-        public $package_author_grup = "";
+        /**
+         * @var string it is the group that releases the package
+         */
+        public $package_author_group = "";
+        /**
+         * @var array a list of owners
+         */
         public $package_owners = array();
+        /**
+         * @var string copyright
+         */
         public $package_copyright = "";
+        /**
+         * @var string url of licence
+         */
         public $package_licenseUrl = "";
+        /**
+         * @var bool if true dna require a acceptance of licence
+         */
         public $package_require_license_acceptance = false;
+        /**
+         * @var string a website
+         */
         public $package_websiteUrl = "";
+        /**
+         * @var string a link of documentation
+         */
         public $package_docUrl = "";
+        /**
+         * @var array a list of extended nodes
+         */
         public $package_node_extend = array();
+        /**
+         * @var string release note
+         */
         public $package_release_note = "";
-        public $package_descripton = "";
+        /**
+         * @var string description of package
+         */
+        public $package_description = "";
+        /**
+         * @var string PNG icon( 32px X 32px ) url
+         */
+        /*
+        ################
+        ################
+        ################
+        ################
+        ################
+        ################
+        ################
+        ################
+        */
         public $package_iconUrl = "";
+        /**
+         * @var mixed|string a tags formatted like [tag1,teg2,teg3,sub tag4,tag4]
+         */
         public $package_tag = "";
-        public $package_depencies = array();
+        /**
+         * @var array a list of dependencies
+         */
+        public $package_dependencies = array();
+        /**
+         * @var string  release date [IS AUTO GENERATED]
+         */
         public $package_release_date = "";
+        /**
+         * @var array an array of tags
+         */
         private $package_tags = array();
 
 
+        /**
+         * package_conf constructor.
+         * @param $jd
+         */
         public function __construct($jd)
         {
             if (array_key_exists("package_name", $jd)) {
@@ -51,8 +126,8 @@ namespace dna\core {
                 $this->package_author = $jd['package_author'];
             }
 
-            if (array_key_exists("package_author_grup", $jd)) {
-                $this->package_author_grup = $jd['package_author_grup'];
+            if (array_key_exists("package_author_group", $jd)) {
+                $this->package_author_group = $jd['package_author_group'];
             }
 
             if (array_key_exists("package_copyright", $jd)) {
@@ -79,8 +154,8 @@ namespace dna\core {
                 $this->package_release_note = $jd['package_release_note'];
             }
 
-            if (array_key_exists("package_descripton", $jd)) {
-                $this->package_descripton = $jd['package_descripton'];
+            if (array_key_exists("package_description", $jd)) {
+                $this->package_description = $jd['package_description'];
             }
 
             if (array_key_exists("package_iconUrl", $jd)) {
@@ -183,13 +258,41 @@ namespace dna\core {
 
             $this->package_tags = explode(",", $this->package_tag);
 
+
+
         }
 
+        /**
+         * @return bool|string
+         */
+        public function generateUID(){
+            if ($this->package_name !== ""){
+                if ($this->package_version !== ""){
+                    if ($this->package_author_group !== ""){
+                        if (isset($this->package_author->author_nic)){
+                            return "{$this->package_name}_$this->package_version@$this->package_author_group.".$this->package_author->author_nic;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /**
+         * @return false|string
+         */
         public function simplify()
         {
-            return FS::JsonStringRemveEmpty(json_encode($this));
+            return FS::JsonStringRemoveEmpty(json_encode($this));
         }
 
+        /**
+         * @param $on
+         * @param $os
+         * @param $oni
+         * @param $ol
+         * @param $oo
+         */
         public function addOwner($on, $os, $oni, $ol, $oo)
         {
             $t_owner = new package_conf\owner();
@@ -201,9 +304,13 @@ namespace dna\core {
             array_push($this->package_owners, $t_owner);
         }
 
+        /**
+         * @param $ref
+         * @param $tp
+         */
         public function addNodeExtend($ref, $tp)
         {
-            $node_extend = new package_conf\node_extend();
+            $node_extend = new PkConf\node_extend();
             $node_extend->node_ref = $ref;
             if ($tp === "1") $tp = "http";
             else if ($tp === "2") $tp = "file_system";
@@ -212,12 +319,18 @@ namespace dna\core {
             array_push($this->package_node_extend, $node_extend);
         }
 
+        /**
+         * @param $tag
+         */
         public function addTag($tag)
         {
             array_push($this->$this->package_tags, $tag);
             $this->tagRegen();
         }
 
+        /**
+         *
+         */
         private function tagRegen()
         {
             $t = "";
@@ -227,27 +340,30 @@ namespace dna\core {
             $this->package_tag = $t;
         }
 
+        /**
+         * @return package_conf
+         */
         public function WithDefault()
         {
             $bas = clone $this;
             $def = null;
             $userDir = FS::getUserHomeDir();
             if (file_exists($userDir . "/.dna/default_conf.json")) {
-                $def = new PkConf(FS::opneJson($userDir . "/.dna/default_conf.json"));
+                $def = new PkConf(FS::openJson($userDir . "/.dna/default_conf.json"));
             }
             if ($def == null) return $bas;
             else {
                 if ($bas->package_name === "" && $def->package_name !== "") $bas->package_name = $def->package_name;
                 if ($bas->package_version === "" && $def->package_version !== "") $bas->package_version = $def->package_version;
                 if ($bas->package_uid === "" && $def->package_uid !== "") $bas->package_uid = $def->package_uid;
-                if ($bas->package_author_grup === "" && $def->package_author_grup !== "") $bas->package_author_grup = $def->package_author_grup;
+                if ($bas->package_author_group === "" && $def->package_author_group !== "") $bas->package_author_group = $def->package_author_group;
                 if ($bas->package_copyright === "" && $def->package_copyright !== "") $bas->package_copyright = $def->package_copyright;
                 if ($bas->package_licenseUrl === "" && $def->package_licenseUrl !== "") $bas->package_licenseUrl = $def->package_licenseUrl;
                 if ($bas->package_require_license_acceptance === "" && $def->package_require_license_acceptance !== "") $bas->package_require_license_acceptance = $def->package_require_license_acceptance;
                 if ($bas->package_websiteUrl === "" && $def->package_websiteUrl !== "") $bas->package_websiteUrl = $def->package_websiteUrl;
                 if ($bas->package_docUrl === "" && $def->package_docUrl !== "") $bas->package_docUrl = $def->package_docUrl;
                 if ($bas->package_release_note === "" && $def->package_release_note !== "") $bas->package_release_note = $def->package_release_note;
-                if ($bas->package_descripton === "" && $def->package_descripton !== "") $bas->package_descripton = $def->package_descripton;
+                if ($bas->package_description === "" && $def->package_description !== "") $bas->package_description = $def->package_description;
                 if ($bas->package_iconUrl === "" && $def->package_iconUrl !== "") $bas->package_iconUrl = $def->package_iconUrl;
                 if ($bas->package_tag === "" && $def->package_tag !== "") $bas->package_tag = $def->package_tag;
                 if ($bas->package_release_date === "" && $def->package_release_date !== "") $bas->package_release_date = $def->package_release_date;
@@ -299,20 +415,24 @@ namespace dna\core {
         }
 
 
+        /**
+         * @param bool $all
+         * @return string
+         */
         public function renderDisplay($all = false)
         {
             /*
                 Package:
-                  Name: package_name      Version: pakege_version
-                  Uid: package_name_pakege_version@pakege_author_grup.author_nic
-                  Group: pakege_author_grup
+                  Name: package_name      Version: package_version
+                  Uid: package_name_pakege_version@pakege_author_group.author_nic
+                  Group: package_author_group
 
                   Release note: package_release_note
                   Release data: package_release_date
                   Description:
-                     package_descripton
+                     package_description
 
-                  Tegs: package_tag
+                  Tags: package_tag
 
                   Icon: package_iconUrl
                   Author :
@@ -333,11 +453,11 @@ namespace dna\core {
                   Node Extend:
                      N) Type: node_type, Reference: node_ref
 
-                  Depencies:
-                     N) Name: package_name, Version: pakege_version, Uid: package_name_pakege_version@pakege_author_grup.author_nic
+                  dependencies:
+                     N) Name: package_name, Version: package_version, Uid: package_name_pakege_version@pakege_author_group.author_nic
              */
             $Des = "";
-            foreach (explode('\n', $this->package_descripton) as $i => $v) $Des .= "      " . $v . "\n";
+            foreach (explode('\n', $this->package_description) as $i => $v) $Des .= "      " . $v . "\n";
             $Owners = "";
             foreach ($this->package_owners as $i => $v)
                 $Owners .= "      " . $i . ")\t" . "Name: " . $v->owner_name . ", Surname: " . $v->owner_surname . ", Nic : " . $v->owner_nic . ", Link: " . $v->owner_link . ", Other: " . $v->owner_other . "\n";
@@ -345,20 +465,20 @@ namespace dna\core {
             foreach ($this->package_node_extend as $i => $v)
                 $Ne .= "      " . $i . ")\t" . "Type: " . $v->node_type . ", Reference: " . $v->node_ref . "\n";
             $de = "";
-            foreach ($this->package_depencies as $i => $v)
+            foreach ($this->package_dependencies as $i => $v)
                 $de .= "      " . $i . ")\t" . "Name: " . $v->package_name . ", Version: " . $v->package_version . ", Uid: " . $v->package_uid . "\n";
             if ($all) {
                 return "Package:\n" .
                     "   Name: " . $this->package_name . ",          Version: " . $this->package_version . "\n" .
-                    "   Uid: " . $this->package_uid . "\n" .
-                    "   Group: " . $this->package_author_grup . "\n\n" .
+                    "   Uid: " . ($this->generateUID()===false?"the Uid could not be generated":$this->generateUID()) . "\n" .
+                    "   Group: " . $this->package_author_group . "\n\n" .
                     "   Release note: " . $this->package_release_note . "\n" .
                     "   Release date: " . $this->package_release_date . "\n" .
                     "   Description:\n" . $Des . "\n" .
-                    "   Tegs: " . $this->package_tag . "\n" .
+                    "   Tags: " . $this->package_tag . "\n" .
                     "   Icon: " . $this->package_iconUrl . "\n\n" .
                     "   Author:\n" .
-                    "      Name: " . $this->package_author->author_name . "      Surname: " . $this->package_author->author_surname . "\n" .
+                    '      Name: ' . $this->package_author->author_name . '      Surname: ' . $this->package_author->author_surname . "\n" .
                     "      Nic: " . $this->package_author->author_nic . "\n" .
                     "      Link: " . $this->package_author->author_link . "\n" .
                     "      Other: " . $this->package_author->author_other . "\n\n" .
@@ -369,8 +489,9 @@ namespace dna\core {
                     "   Website: " . $this->package_websiteUrl . "\n" .
                     "   Doc: " . $this->package_docUrl . "\n\n" .
                     "   Node Extend: \n" . $Ne . "\n" .
-                    "   Depencies: \n" . $Ne . "\n";
+                    "   dependencies: \n" . $Ne . "\n";
             }
+            return "";
         }
     }
 }

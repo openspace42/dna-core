@@ -4,7 +4,7 @@ namespace dna\core {
 
     class fileSystem
     {
-        public function open($s, $r = true, $w = false, $p = false)
+        public static function open($s, $r = true, $w = false, $p = false)
         {
             $m = "";
             if ($r && !$w && !$p) {
@@ -40,22 +40,22 @@ namespace dna\core {
             }
         }
 
-        public function close($f)
+        public static function close($f)
         {
             return fclose($f);
         }
 
-        public function getChar($f)
+        public static function getChar($f)
         {
             return fgetc($f);
         }
 
-        public function getLine($f)
+        public static function getLine($f)
         {
             return fgets($f);
         }
 
-        public function getAll($f)
+        public static function getAll($f)
         {
             $ret = "";
             while (!feof($f)) {
@@ -64,7 +64,7 @@ namespace dna\core {
             return $ret;
         }
 
-        public function getAllPath($p)
+        public static function getAllPath($p)
         {
             $f = fileSystem::open($p);
             $ret = fileSystem::getAll($f);
@@ -72,33 +72,33 @@ namespace dna\core {
             return $ret;
         }
 
-        public function write($f, $s)
+        public static function write($f, $s)
         {
             fwrite($f, $s);
         }
 
-        public function writeAllPath($p, $s, $pr = false)
+        public static function writeAllPath($p, $s, $pr = false)
         {
             $f = fileSystem::open($p, false, true, $pr);
             fileSystem::write($f, $s);
             fileSystem::close($f);
         }
 
-        public function toAbsolutePath($p)
+        public static function toAbsolutePath($p)
         {
             return realpath($p);
         }
 
-        public function opneJson($p)
+        public static function openJson($p)
         {
             return json_decode(fileSystem::getAllPath($p), true);
         }
 
-        public function JsonRemveEmpty($j)
+        public static function JsonRemoveEmpty($j)
         {
             foreach ($j as $k => &$v) {
                 if (is_array($v)) {
-                    $v = fileSystem::JsonRemveEmpty($v);
+                    $v = fileSystem::JsonRemoveEmpty($v);
                     if (!sizeof($v)) {
                         unset($j[$k]);
                     }
@@ -109,12 +109,12 @@ namespace dna\core {
             return $j;
         }
 
-        public function JsonStringRemveEmpty($j)
+        public static function JsonStringRemoveEmpty($j)
         {
-            return json_encode(fileSystem::JsonRemveEmpty(json_decode($j, true)), JSON_PRETTY_PRINT);
+            return json_encode(fileSystem::JsonRemoveEmpty(json_decode($j, true)), JSON_PRETTY_PRINT);
         }
 
-        public function getUserHomeDir()
+        public static function getUserHomeDir()
         {
             $home = getenv('HOME');
             if (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {

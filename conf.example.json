@@ -2,7 +2,7 @@
     "package_name": "",
     "package_version": "",
     "package_uid":"{package_name}_{package_version}@{package_author_grup}.{package_author->author_nic}",
-    "package_author_grup": "",
+    "package_author_group": "",
     "package_author" : {
         "author_name":"" ,
         "author_surname":"",
@@ -38,10 +38,10 @@
         }
     ],
     "package_release_note":"",
-    "package_descripton":"",
+    "package_description":"",
     "package_iconUrl":"",
     "package_tag":"",
-    "package_depencies": [
+    "package_dependencies": [
         {
             "package_name":"",
             "package_version":"",
