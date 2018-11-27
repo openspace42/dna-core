@@ -4,6 +4,7 @@ namespace dna\core {
     require_once __DIR__ . "/fileSystem.php";
     require_once __DIR__ . "/package_conf.php";
     require_once __DIR__ . "/dna_messages.php";
+    require_once __DIR__ . "/ToolAddDependencies.php";
 
     use dna\core\fileSystem as FS;
     use dna\core\package_conf as PKConf;
@@ -362,7 +363,11 @@ namespace dna\core {
                                     $package_add = false;
                                     break;
                                 case 'dependencies':
-                                    $this->confAddDependencies($cof_def);
+                                    $pkconf = null;
+                                    if ($cof_def) $pkconf = $this->InitDefaultConf();
+                                    else $pkconf = $this->InitConf()->WithDefault();
+                                    new PKConf\ToolAddDependencies($this->run_path,$pkconf,$cof_def);
+                                    unset($pkconf);
                                     $cof_def = false;
                                     $package_add = false;
                                     break;
@@ -403,9 +408,9 @@ namespace dna\core {
         private function InitConf()
         {
             if (!file_exists($this->run_path . "/conf.json")) {
-                $res = $this->IO_get("was not found the conf.json file, create one (y|yes/n|no)?");
+                $res = FS::IO_get("was not found the conf.json file, create one (y|yes/n|no)?");
                 if ($res === "y" || $res === "yes") {
-                    $res = $this->IO_get("start with local default conf (y|yes/n|no)?");
+                    $res = FS::IO_get("start with local default conf (y|yes/n|no)?");
                     if ($res === "y" || $res === "yes") {
                         $pkconf = $this->InitDefaultConf();
                         FS::writeAllPath($this->run_path . "/conf.json", $pkconf->simplify());
@@ -424,16 +429,7 @@ namespace dna\core {
             }
         }
 
-        private function IO_get($s, $n = true)
-        {
-            if (PHP_OS == 'WINNT') {
-                new core\info($s, $n);
-                return stream_get_line(STDIN, 1024, PHP_EOL);
-            } else {
-                new core\info($s, $n);
-                return readline();
-            }
-        }
+
 
 
         //region Conf
@@ -441,10 +437,18 @@ namespace dna\core {
         private function InitDefaultConf()
         {
             $userDir = FS::getUserHomeDir();
+            if (!file_exists($userDir . "/.dna/")) {
+                $res=FS::IO_get("The " . $userDir . "/.dna/ folder was not found, create one (y|yes/n|no)?");
+                if ($res === "y" || $res === "yes") {
+                    mkdir($userDir . "/.dna");
+                }else{
+                    new core\error("the creation of " . $userDir . "/.dna/ has been canceled, exit ...");
+                }
+            }
             if (file_exists($userDir . "/.dna/default_conf.json")) {
                 return new PKConf(FS::openJson($userDir . "/.dna/default_conf.json"));
             } else {
-                $res = $this->IO_get("was not found the " . $userDir . "/.dna/default_conf.json file, create one (y|yes/n|no)?");
+                $res = FS::IO_get("was not found the " . $userDir . "/.dna/default_conf.json file, create one (y|yes/n|no)?");
                 if ($res === "y" || $res === "yes") {
                     $pkconf = new PKConf(array());
                     FS::writeAllPath($userDir . "/.dna/default_conf.json", $pkconf->simplify());
@@ -491,13 +495,13 @@ namespace dna\core {
             if ($g) $pkconf = $this->InitDefaultConf();
             else $pkconf = $this->InitConf();
             if ($pkconf == null) new core\error("sorry but something went wrong");
-            $on = $this->IO_get("owner_name (empty of null):");
-            $os = $this->IO_get("owner_surname (empty of null):");
+            $on = FS::IO_get("owner_name (empty of null):");
+            $os = FS::IO_get("owner_surname (empty of null):");
             $oni = null;
             while ($oni == null)
-                $oni = $this->IO_get("owner_nic (obligatory):");
-            $ol = $this->IO_get("owner_link (empty of null):");
-            $oo = $this->IO_get("owner_other (empty of null):");
+                $oni = FS::IO_get("owner_nic (obligatory):");
+            $ol = FS::IO_get("owner_link (empty of null):");
+            $oo = FS::IO_get("owner_other (empty of null):");
             $pkconf->addOwner($on, $os, $oni, $ol, $oo);
             if ($g) new core\success("Owner successful add on " . $userDir . "/.dna/default_conf.json");
             else new core\success("Owner successful add on " . $this->run_path . "/conf.json");
@@ -514,33 +518,15 @@ namespace dna\core {
             if ($pkconf == null) new core\error("sorry but something went wrong");
             $ref = null;
             while ($ref == null)
-                $ref = $this->IO_get("node_ref (obligatory):");
+                $ref = FS::IO_get("node_ref (obligatory):");
             $tp = null;
             while ($tp != "1" || $tp != "2") {
-                $tp = $this->IO_get("node_type ([ 1 | empty ] http , [2] file_system):");
+                $tp = FS::IO_get("node_type ([ 1 | empty ] http , [2] file_system):");
                 if ($tp == "") $tp = "1";
             }
             $pkconf->addNodeExtend($ref, $tp);
             if ($g) new core\success("Owner successful add on " . $userDir . "/.dna/default_conf.json");
             else new core\success("Owner successful add on " . $this->run_path . "/conf.json");
-            if ($g) FS::writeAllPath($userDir . "/.dna/default_conf.json", $pkconf->simplify());
-            else FS::writeAllPath($this->run_path . "/conf.json", $pkconf->simplify());
-        }
-
-        private function confAddDependencies($g = false)
-        {
-            $userDir = FS::getUserHomeDir();
-            $pkconf = null;
-            if ($g) $pkconf = $this->InitDefaultConf();
-            else $pkconf = $this->InitConf();
-            if ($pkconf == null) new core\error("sorry but something went wrong");
-            new core\info("Welcome to dna search dependencies tool");
-            new core\message("options: s) for search,  a) add filter,  import <search index>) to import a dependencies, h) display help,  e) to exit");
-            $in = "";
-            while ($in != "e" && $in != "exit") {
-                $in = $this->IO_get("option >", false);
-
-            }
             if ($g) FS::writeAllPath($userDir . "/.dna/default_conf.json", $pkconf->simplify());
             else FS::writeAllPath($this->run_path . "/conf.json", $pkconf->simplify());
         }
@@ -551,7 +537,7 @@ namespace dna\core {
             $pkconf = null;
             if ($g) $pkconf = $this->InitDefaultConf();
             else $pkconf = $this->InitConf();
-            $tag = $this->IO_get("tag: (empty for cancel):");
+            $tag = FS::IO_get("tag: (empty for cancel):");
             if ($tag != "")
                 $pkconf->addTag($tag);
             if ($g) FS::writeAllPath($userDir . "/.dna/default_conf.json", $pkconf->simplify());

@@ -1,6 +1,8 @@
 <?php
 
 namespace dna\core {
+    require_once __DIR__ . "/dna_messages.php";
+    use dna\core as core;
 
     class fileSystem
     {
@@ -122,6 +124,17 @@ namespace dna\core {
             }
             $ret = (empty($home) ? NULL : $home);
             return $ret;
+        }
+
+        public  static function IO_get($s, $n = false)
+        {
+            if (PHP_OS == 'WINNT') {
+                new core\info($s, $n);
+                return stream_get_line(STDIN, 1024, PHP_EOL);
+            } else {
+                new core\info($s, $n);
+                return readline();
+            }
         }
     }
 }

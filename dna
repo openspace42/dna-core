@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!./php7.2.5_openspace42_portable/php
 <?php
 
 namespace {

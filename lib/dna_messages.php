@@ -17,15 +17,16 @@ namespace dna\core {
          */
         public function __construct($s, $e = true,$n=true)
         {
-            $s = "\033[38;2;255;179;186m[ERROR]: " . $s . "\033[39m";
-            if ($e) {
-                new message($s,$n);
+            new message($this->prepare_with_Label($s),$n);
+            if ($e)
                 die();
-            } else {
-                new message($s,$n);
-            }
-
         }
+        public static function prepare_with_Label($s){return error::prepare("[ERROR]: ".$s);}
+        /**
+         * @param string $s input to color
+         * @return string return a string with error color
+         */
+        public static function prepare($s){return "\033[38;2;255;179;186m" . $s . "\033[39m";}
     }
 
     /**
@@ -59,10 +60,13 @@ namespace dna\core {
          */
         public function __construct($s,$n = true)
         {
-            $s = "\033[38;2;186;255;201m" . $s . "\033[39m\n";
-            new message($s,$n);
+            new message($this->prepare($s), $n);
         }
-
+        /**
+         * @param string $s input to color
+         * @return string return a string with success color
+         */
+        public static function prepare($s){return "\033[38;2;186;255;201m" . $s . "\033[39m";}
     }
 
     /**
@@ -78,9 +82,13 @@ namespace dna\core {
          */
         public function __construct($s,$n = true)
         {
-            $s = "\033[38;2;255;255;186m" . $s . "\033[39m\n";
-            new message($s,$n);
+            new message($this->prepare($s), $n);
         }
+        /**
+         * @param string $s input to color
+         * @return string return a string with warning color
+         */
+        public static function prepare($s){return "\033[38;2;255;255;186m" . $s . "\033[39m";}
 
     }
     /**
@@ -96,9 +104,14 @@ namespace dna\core {
          */
         public function __construct($s, $n = true)
         {
-            $s = "\033[38;2;186;225;255m" . $s . "\033[39m";
-            new message($s, $n);
+            new message($this->prepare($s), $n);
         }
+
+        /**
+         * @param string $s input to color
+         * @return string return a string with info color
+         */
+        public static function prepare($s){return "\033[38;2;186;225;255m" . $s . "\033[39m";}
     }
 
 }

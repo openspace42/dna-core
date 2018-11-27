@@ -6,9 +6,12 @@ namespace dna\core {
     require_once __DIR__ . "/owner.php";
     require_once __DIR__ . "/node_extend.php";
     require_once __DIR__ . "/fileSystem.php";
+    require_once  __DIR__ . "/network.php";
 
     use dna\core\package_conf as PkConf;
     use dna\core\fileSystem as FS;
+    use dna\core\network as NET;
+    use dna\core as core;
 
     /**
      * Class package_conf represents a conf.json
@@ -463,7 +466,12 @@ namespace dna\core {
                 $Owners .= "      " . $i . ")\t" . "Name: " . $v->owner_name . ", Surname: " . $v->owner_surname . ", Nic : " . $v->owner_nic . ", Link: " . $v->owner_link . ", Other: " . $v->owner_other . "\n";
             $Ne = "";
             foreach ($this->package_node_extend as $i => $v)
-                $Ne .= "      " . $i . ")\t" . "Type: " . $v->node_type . ", Reference: " . $v->node_ref . "\n";
+                $Ne .= "      " . $i . ")\t" . "Type: " . $v->node_type . ", Reference: " . $v->node_ref . "  , STATUS: ".
+                    (($v->node_type=="http")?
+                    (NET::URLIsValid($v->node_ref."/dna-node.json")?core\success::prepare("OK"):core\error::prepare("NO!")):
+                        (file_exists($v->node_ref."/dna-node.json")?core\success::prepare("OK"):core\error::prepare("NO!"))
+                    ).
+                    "\n";
             $de = "";
             foreach ($this->package_dependencies as $i => $v)
                 $de .= "      " . $i . ")\t" . "Name: " . $v->package_name . ", Version: " . $v->package_version . ", Uid: " . $v->package_uid . "\n";
@@ -489,7 +497,7 @@ namespace dna\core {
                     "   Website: " . $this->package_websiteUrl . "\n" .
                     "   Doc: " . $this->package_docUrl . "\n\n" .
                     "   Node Extend: \n" . $Ne . "\n" .
-                    "   dependencies: \n" . $Ne . "\n";
+                    "   dependencies: \n" . $de . "\n";
             }
             return "";
         }
