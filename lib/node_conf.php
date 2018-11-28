@@ -3,7 +3,7 @@
 
 namespace dna\core {
 
-    include_once __DIR__ ."/node_package.php";
+    include_once __DIR__ . "/node_package.php";
 
     use dna\core\node_conf\node_package as NP;
 
@@ -19,7 +19,7 @@ namespace dna\core {
         public function __construct($jd)
         {
             if (array_key_exists("node_name", $jd)) {
-                $this->node_name = $jd['$node_name'];
+                $this->node_name = $jd['node_name'];
             }
             if (array_key_exists("node_ref", $jd)) {
                 $this->node_ref = $jd['node_ref'];
@@ -52,11 +52,11 @@ namespace dna\core {
 
             $this->node_packages = array();
             $node_packages = array();
-            if (array_key_exists("$node_packages", $jd)) {
-                $node_packages = $jd['$node_packages'];
+            if (array_key_exists("node_packages", $jd)) {
+                $node_packages = $jd['node_packages'];
             }
 
-            foreach ($node_packages as $i => $v){
+            foreach ($node_packages as $i => $v) {
                 $node_package = new NP();
                 if (array_key_exists("node_package_desc", $v)) {
                     $node_package->node_package_desc = new package_conf($v['node_package_desc']);
@@ -64,7 +64,7 @@ namespace dna\core {
                 if (array_key_exists("node_package_ref", $v)) {
                     $node_package->node_package_ref = $v['node_package_ref'];
                 }
-
+                array_push($this->node_packages, $node_package);
             }
         }
 

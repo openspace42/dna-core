@@ -6,7 +6,7 @@ namespace dna\core {
     require_once __DIR__ . "/owner.php";
     require_once __DIR__ . "/node_extend.php";
     require_once __DIR__ . "/fileSystem.php";
-    require_once  __DIR__ . "/network.php";
+    require_once __DIR__ . "/network.php";
 
     use dna\core\package_conf as PkConf;
     use dna\core\fileSystem as FS;
@@ -262,23 +262,6 @@ namespace dna\core {
             $this->package_tags = explode(",", $this->package_tag);
 
 
-
-        }
-
-        /**
-         * @return bool|string
-         */
-        public function generateUID(){
-            if ($this->package_name !== ""){
-                if ($this->package_version !== ""){
-                    if ($this->package_author_group !== ""){
-                        if (isset($this->package_author->author_nic)){
-                            return "{$this->package_name}_$this->package_version@$this->package_author_group.".$this->package_author->author_nic;
-                        }
-                    }
-                }
-            }
-            return false;
         }
 
         /**
@@ -417,7 +400,6 @@ namespace dna\core {
             }
         }
 
-
         /**
          * @param bool $all
          * @return string
@@ -466,11 +448,11 @@ namespace dna\core {
                 $Owners .= "      " . $i . ")\t" . "Name: " . $v->owner_name . ", Surname: " . $v->owner_surname . ", Nic : " . $v->owner_nic . ", Link: " . $v->owner_link . ", Other: " . $v->owner_other . "\n";
             $Ne = "";
             foreach ($this->package_node_extend as $i => $v)
-                $Ne .= "      " . $i . ")\t" . "Type: " . $v->node_type . ", Reference: " . $v->node_ref . "  , STATUS: ".
-                    (($v->node_type=="http")?
-                    (NET::URLIsValid($v->node_ref."/dna-node.json")?core\success::prepare("OK"):core\error::prepare("NO!")):
-                        (file_exists($v->node_ref."/dna-node.json")?core\success::prepare("OK"):core\error::prepare("NO!"))
-                    ).
+                $Ne .= "      " . $i . ")\t" . "Type: " . $v->node_type . ", Reference: " . $v->node_ref . "  , STATUS: " .
+                    (($v->node_type == "http") ?
+                        (NET::URLIsValid($v->node_ref . "/dna-node.json") ? core\success::prepare("OK") : core\error::prepare("NO!")) :
+                        (file_exists($v->node_ref . "/dna-node.json") ? core\success::prepare("OK") : core\error::prepare("NO!"))
+                    ) .
                     "\n";
             $de = "";
             foreach ($this->package_dependencies as $i => $v)
@@ -478,7 +460,7 @@ namespace dna\core {
             if ($all) {
                 return "Package:\n" .
                     "   Name: " . $this->package_name . ",          Version: " . $this->package_version . "\n" .
-                    "   Uid: " . ($this->generateUID()===false?"the Uid could not be generated":$this->generateUID()) . "\n" .
+                    "   Uid: " . ($this->generateUID() === false ? "the Uid could not be generated" : $this->generateUID()) . "\n" .
                     "   Group: " . $this->package_author_group . "\n\n" .
                     "   Release note: " . $this->package_release_note . "\n" .
                     "   Release date: " . $this->package_release_date . "\n" .
@@ -501,36 +483,84 @@ namespace dna\core {
             }
             return "";
         }
-        public function renderingFilter(){
+
+        /**
+         * @return bool|string
+         */
+        public function generateUID()
+        {
+            if ($this->package_name !== "") {
+                if ($this->package_version !== "") {
+                    if ($this->package_author_group !== "") {
+                        if (isset($this->package_author->author_nic)) {
+                            return "{$this->package_name}_$this->package_version@$this->package_author_group." . $this->package_author->author_nic;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public function renderingFilter()
+        {
             /*
              package_name package_version package_uid package_author_group package_copyright package_licenseUrl
                   package_require_license_acceptance package_websiteUrl package_docUrl package_author package_release_note package_description
                   package_iconUrl package_tag
              */
-            $out="";
-            if ($this->package_name!=="") $out.=(($out==="")?"":",")."package_name: ".$this->package_name;
-            if ($this->package_version!=="") $out.=(($out==="")?"":",")."package_version: ".$this->package_version;
-            if ($this->package_uid!=="") $out.=(($out==="")?"":",")."package_uid: ".$this->package_uid;
-            if ($this->package_author_group!=="") $out.=(($out==="")?"":",")."package_author_group: ".$this->package_author_group;
-            if ($this->package_copyright!=="") $out.=(($out==="")?"":",")."package_copyright: ".$this->package_copyright;
-            if ($this->package_licenseUrl!=="") $out.=(($out==="")?"":",")."package_licenseUrl: ".$this->package_licenseUrl;
-            if ($this->package_require_license_acceptance!==false) $out.=(($out==="")?"":",")."package_require_license_acceptance: ".$this->package_require_license_acceptance;
-            if ($this->package_websiteUrl!=="") $out.=(($out==="")?"":",")."package_websiteUrl: ".$this->package_websiteUrl;
-            if ($this->package_docUrl!=="") $out.=(($out==="")?"":",")."package_docUrl: ".$this->package_docUrl;
+            $out = "";
+            if ($this->package_name !== "") $out .= (($out === "") ? "" : ", ") . "package_name: " . $this->package_name;
+            if ($this->package_version !== "") $out .= (($out === "") ? "" : ", ") . "package_version: " . $this->package_version;
+            if ($this->package_uid !== "") $out .= (($out === "") ? "" : ", ") . "package_uid: " . $this->package_uid;
+            if ($this->package_author_group !== "") $out .= (($out === "") ? "" : ", ") . "package_author_group: " . $this->package_author_group;
+            if ($this->package_copyright !== "") $out .= (($out === "") ? "" : ", ") . "package_copyright: " . $this->package_copyright;
+            if ($this->package_licenseUrl !== "") $out .= (($out === "") ? "" : ", ") . "package_licenseUrl: " . $this->package_licenseUrl;
+            if ($this->package_require_license_acceptance !== false) $out .= (($out === "") ? "" : ", ") . "package_require_license_acceptance: " . $this->package_require_license_acceptance;
+            if ($this->package_websiteUrl !== "") $out .= (($out === "") ? "" : ", ") . "package_websiteUrl: " . $this->package_websiteUrl;
+            if ($this->package_docUrl !== "") $out .= (($out === "") ? "" : ", ") . "package_docUrl: " . $this->package_docUrl;
 
-            if($this->package_author->author_name!=="") $out.=(($out==="")?"":",")."package_author->author_name: ".$this->package_author->author_name;
-            if($this->package_author->author_surname!=="") $out.=(($out==="")?"":",")."package_author->author_surname: ".$this->package_author->author_surname;
-            if($this->package_author->author_nic!=="") $out.=(($out==="")?"":",")."package_author->author_nic: ".$this->package_author->author_nic;
-            if($this->package_author->author_link!=="") $out.=(($out==="")?"":",")."package_author->author_link: ".$this->package_author->author_link;
-            if($this->package_author->author_other!=="") $out.=(($out==="")?"":",")."package_author->author_other ".$this->package_author->author_other;
+            if ($this->package_author->author_name !== "") $out .= (($out === "") ? "" : ", ") . "package_author->author_name: " . $this->package_author->author_name;
+            if ($this->package_author->author_surname !== "") $out .= (($out === "") ? "" : ", ") . "package_author->author_surname: " . $this->package_author->author_surname;
+            if ($this->package_author->author_nic !== "") $out .= (($out === "") ? "" : ", ") . "package_author->author_nic: " . $this->package_author->author_nic;
+            if ($this->package_author->author_link !== "") $out .= (($out === "") ? "" : ", ") . "package_author->author_link: " . $this->package_author->author_link;
+            if ($this->package_author->author_other !== "") $out .= (($out === "") ? "" : ", ") . "package_author->author_other " . $this->package_author->author_other;
 
-            if ($this->package_release_note!=="") $out.=(($out==="")?"":",")."package_release_note: ".$this->package_release_note;
-            if ($this->package_description!=="") $out.=(($out==="")?"":",")."package_description: ".$this->package_description;
-            if ($this->package_iconUrl!=="") $out.=(($out==="")?"":",")."package_iconUrl: ".$this->package_iconUrl;
+            if ($this->package_release_note !== "") $out .= (($out === "") ? "" : ", ") . "package_release_note: " . $this->package_release_note;
+            if ($this->package_description !== "") $out .= (($out === "") ? "" : ", ") . "package_description: " . $this->package_description;
+            if ($this->package_iconUrl !== "") $out .= (($out === "") ? "" : ", ") . "package_iconUrl: " . $this->package_iconUrl;
             $this->tagRegen();
-            if ($this->package_tag!=="") $out.=(($out==="")?"":", ")."package_tag: ".$this->package_tag;
+            if ($this->package_tag !== "") $out .= (($out === "") ? "" : ", ") . "package_tag: " . $this->package_tag;
 
             return $out;
+        }
+
+        public function renderingSearch()
+        {
+            /*
+                Search index : 1)
+                    Name: DNA-IO          Version: 1.0.0-DEV          By: Openspace42@GianfriAur         Author: Gianfrancesco Aurecchia
+                    UID: DAN-IO_1.0.0-Dev@Openspace42.GianfriAur      Copyright: © GianfriAur 2018
+                    Licence: require acceptance: YES|NO,  link:package_licenseUrl
+                    Tags:
+                    Description:
+                    release_note :
+             */
+
+            return "\tName: ".$this->package_name."          Version: ".$this->package_version."          By: ".$this->package_author_group."@".$this->package_author->author_nic ."         Author: ".$this->package_author->author_name ." ".$this->package_author->author_surname ."\n".
+                    "\tUID: ".$this->package_uid."      Copyright: ".$this->package_copyright."\n".
+                    "\tLicence: require acceptance: ".($this->package_require_license_acceptance?"Yes":"No").",  link: ".$this->package_licenseUrl."\n".
+                    "\tTags: ".$this->package_tag."\n".
+                    "\tDescription: ".$this->package_description."\n".
+                    "\tRelease_note: ".$this->package_release_note;
+        }
+
+        /**
+         * @param package_conf $PkTo return true if this package can is PkTo
+         * @return bool
+         */
+        public function match($PkTo)
+        {
+            return package_conf::compare($this, $PkTo);
         }
 
         /**
@@ -538,45 +568,75 @@ namespace dna\core {
          * @param package_conf $PkTo
          * @return bool
          */
-        public static function compare($PkFrom, $PkTo){
-            if ($PkFrom->package_name!=="" && $PkTo->package_name!=""){ if ($PkFrom->package_name!==$PkTo->package_name) return false;}
-            if ($PkFrom->package_version!=="" && $PkTo->package_version!=""){ if ($PkFrom->package_version!==$PkTo->package_version) return false;}
-            if ($PkFrom->package_uid!=="" && $PkTo->package_uid!=""){ if ($PkFrom->package_uid!==$PkTo->package_uid) return false;}
-            if ($PkFrom->package_author_group!=="" && $PkTo->package_author_group!=""){ if ($PkFrom->package_author_group!==$PkTo->package_author_group) return false;}
-            if ($PkFrom->package_release_note!=="" && $PkTo->package_release_note!=""){ if ($PkFrom->package_release_note!==$PkTo->package_release_note) return false;}
-            if ($PkFrom->package_release_date!=="" && $PkTo->package_release_date!=""){ if ($PkFrom->package_release_date!==$PkTo->package_release_date) return false;}
-            if ($PkFrom->package_description!=="" && $PkTo->package_description!=""){ if ($PkFrom->package_description!==$PkTo->package_description) return false;}
+        public static function compare($PkFrom, $PkTo)
+        {
 
-            if ($PkFrom->package_tag!=="" && $PkTo->package_tag!=""){
-                foreach ($PkFrom->package_tags as $i => $v){
-                    if(!in_array($v,$PkTo->package_tags,true)) return false;
+            if (isset($PkFrom->package_name)) if ($PkFrom->package_name !== "" && $PkTo->package_name != "") {
+                if ($PkFrom->package_name !== $PkTo->package_name) return false;
+            }
+            if (isset($PkFrom->package_version)) if ($PkFrom->package_version !== "" && $PkTo->package_version != "") {
+                if ($PkFrom->package_version !== $PkTo->package_version) return false;
+            }
+            if (isset($PkFrom->package_uid)) if ($PkFrom->package_uid !== "" && $PkTo->package_uid != "") {
+                if ($PkFrom->package_uid !== $PkTo->package_uid) return false;
+            }
+            if (isset($PkFrom->package_author_group)) if ($PkFrom->package_author_group !== "" && $PkTo->package_author_group != "") {
+                if ($PkFrom->package_author_group !== $PkTo->package_author_group) return false;
+            }
+            if (isset($PkFrom->package_release_note)) if ($PkFrom->package_release_note !== "" && $PkTo->package_release_note != "") {
+                if ($PkFrom->package_release_note !== $PkTo->package_release_note) return false;
+            }
+            if (isset($PkFrom->package_release_date)) if ($PkFrom->package_release_date !== "" && $PkTo->package_release_date != "") {
+                if ($PkFrom->package_release_date !== $PkTo->package_release_date) return false;
+            }
+            if (isset($PkFrom->package_description)) if ($PkFrom->package_description !== "" && $PkTo->package_description != "") {
+                if ($PkFrom->package_description !== $PkTo->package_description) return false;
+            }
+
+            if (isset($PkFrom->package_tag)) if ($PkFrom->package_tag !== "" && $PkTo->package_tag != "") {
+                foreach ($PkFrom->package_tags as $i => $v) {
+                    if (!in_array($v, $PkTo->package_tags, true)) return false;
                 }
             }
 
-            if ($PkFrom->package_iconUrl!=="" && $PkTo->package_iconUrl!=""){ if ($PkFrom->package_iconUrl!==$PkTo->package_iconUrl) return false;}
+            if (isset($PkFrom->package_iconUrl)) if ($PkFrom->package_iconUrl !== "" && $PkTo->package_iconUrl != "") {
+                if ($PkFrom->package_iconUrl !== $PkTo->package_iconUrl) return false;
+            }
 
+            if (isset($PkFrom->package_author)) {
+                if (isset($PkFrom->package_author->author_name)) if ($PkFrom->package_author->author_name !== "" && $PkTo->package_author->author_name != "") {
+                    if ($PkFrom->package_author->author_name !== $PkTo->package_author->author_name) return false;
+                }
+                if (isset($PkFrom->package_author->author_surname)) if ($PkFrom->package_author->author_surname !== "" && $PkTo->package_author->author_surname != "") {
+                    if ($PkFrom->package_author->author_surname !== $PkTo->package_author->author_surname) return false;
+                }
+                if (isset($PkFrom->package_author->author_nic)) if ($PkFrom->package_author->author_nic !== "" && $PkTo->package_author->author_nic != "") {
+                    if ($PkFrom->package_author->author_nic !== $PkTo->package_author->author_nic) return false;
+                }
+                if (isset($PkFrom->package_author->author_link)) if ($PkFrom->package_author->author_link !== "" && $PkTo->package_author->author_link != "") {
+                    if ($PkFrom->package_author->author_link !== $PkTo->package_author->author_link) return false;
+                }
+                if (isset($PkFrom->package_author->author_other)) if ($PkFrom->package_author->author_other !== "" && $PkTo->package_author->author_other != "") {
+                    if ($PkFrom->package_author->author_other !== $PkTo->package_author->author_other) return false;
+                }
+            }
+            if (isset($PkFrom->package_copyright)) if ($PkFrom->package_copyright !== "" && $PkTo->package_copyright != "") {
+                if ($PkFrom->package_copyright !== $PkTo->package_copyright) return false;
+            }
+            if (isset($PkFrom->package_licenseUrl)) if ($PkFrom->package_licenseUrl !== "" && $PkTo->package_licenseUrl != "") {
+                if ($PkFrom->package_licenseUrl !== $PkTo->package_licenseUrl) return false;
+            }
+            if (isset($PkFrom->package_require_license_acceptance)) if ($PkFrom->package_require_license_acceptance !== "" && $PkTo->package_require_license_acceptance != "") {
+                if ($PkFrom->package_require_license_acceptance !== $PkTo->package_require_license_acceptance) return false;
+            }
+            if (isset($PkFrom->package_websiteUrl)) if ($PkFrom->package_websiteUrl !== "" && $PkTo->package_websiteUrl != "") {
+                if ($PkFrom->package_websiteUrl !== $PkTo->package_websiteUrl) return false;
+            }
+            if (isset($PkFrom->package_docUrl)) if ($PkFrom->package_docUrl !== "" && $PkTo->package_docUrl != "") {
+                if ($PkFrom->package_docUrl !== $PkTo->package_docUrl) return false;
+            }
 
-            if ($PkFrom->package_author->author_name!=="" && $PkTo->package_author->author_name!=""){ if ($PkFrom->package_author->author_name!==$PkTo->package_author->author_name) return false;}
-            if ($PkFrom->package_author->author_surname!=="" && $PkTo->package_author->author_surname!=""){ if ($PkFrom->package_author->author_surname!==$PkTo->package_author->author_surname) return false;}
-            if ($PkFrom->package_author->author_nic!=="" && $PkTo->package_author->author_nic!=""){ if ($PkFrom->package_author->author_nic!==$PkTo->package_author->author_nic) return false;}
-            if ($PkFrom->package_author->author_link!=="" && $PkTo->package_author->author_link!=""){ if ($PkFrom->package_author->author_link!==$PkTo->package_author->author_link) return false;}
-            if ($PkFrom->package_author->author_other!=="" && $PkTo->package_author->author_other!=""){ if ($PkFrom->package_author->author_other!==$PkTo->package_author->author_other) return false;}
-
-            if ($PkFrom->package_copyright!=="" && $PkTo->package_copyright!=""){ if ($PkFrom->package_copyright!==$PkTo->package_copyright) return false;}
-            if ($PkFrom->package_licenseUrl!=="" && $PkTo->package_licenseUrl!=""){ if ($PkFrom->package_licenseUrl!==$PkTo->package_licenseUrl) return false;}
-            if ($PkFrom->package_require_license_acceptance!=="" && $PkTo->package_require_license_acceptance!=""){ if ($PkFrom->package_require_license_acceptance!==$PkTo->package_require_license_acceptance) return false;}
-            if ($PkFrom->package_websiteUrl!=="" && $PkTo->package_websiteUrl!=""){ if ($PkFrom->package_websiteUrl!==$PkTo->package_websiteUrl) return false;}
-            if ($PkFrom->package_docUrl!=="" && $PkTo->package_docUrl!=""){ if ($PkFrom->package_docUrl!==$PkTo->package_docUrl) return false;}
-
-            return false;
-        }
-
-        /**
-         * @param package_conf $PkTo return true if this package can is PkTo
-         * @return bool
-         */
-        public function match($PkTo){
-            return package_conf::compare($this,$PkTo);
+            return true;
         }
     }
 }

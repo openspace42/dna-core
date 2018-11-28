@@ -366,7 +366,7 @@ namespace dna\core {
                                     $pkconf = null;
                                     if ($cof_def) $pkconf = $this->InitDefaultConf();
                                     else $pkconf = $this->InitConf()->WithDefault();
-                                    new PKConf\ToolAddDependencies($this->run_path,$pkconf,$cof_def);
+                                    new PKConf\ToolAddDependencies($this->run_path, $pkconf, $cof_def);
                                     unset($pkconf);
                                     $cof_def = false;
                                     $package_add = false;
@@ -430,18 +430,16 @@ namespace dna\core {
         }
 
 
-
-
         //region Conf
 
         private function InitDefaultConf()
         {
             $userDir = FS::getUserHomeDir();
             if (!file_exists($userDir . "/.dna/")) {
-                $res=FS::IO_get("The " . $userDir . "/.dna/ folder was not found, create one (y|yes/n|no)?");
+                $res = FS::IO_get("The " . $userDir . "/.dna/ folder was not found, create one (y|yes/n|no)?");
                 if ($res === "y" || $res === "yes") {
                     mkdir($userDir . "/.dna");
-                }else{
+                } else {
                     new core\error("the creation of " . $userDir . "/.dna/ has been canceled, exit ...");
                 }
             }

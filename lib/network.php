@@ -18,4 +18,14 @@ class network
         }
         return $exists;
     }
+
+    public static function GET($s){
+        return file_get_contents($s);
+    }
+
+    public static function openJson($URL,$ReqType="GET")
+    {
+        if ($ReqType==="GET")
+        return json_decode(network::GET($URL), true);
+    }
 }
