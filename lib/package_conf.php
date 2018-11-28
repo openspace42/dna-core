@@ -258,8 +258,17 @@ namespace dna\core {
             while ($this->package_tag != str_replace(", ", ",", $this->package_tag)) {
                 $this->package_tag = str_replace(", ", ",", $this->package_tag);
             }
-
+            if ($this->package_tag!=="")
             $this->package_tags = explode(",", $this->package_tag);
+            else
+                $this->package_tags=array();
+
+            //dependencies
+
+            if (array_key_exists("package_dependencies", $jd)) {
+                foreach ( $jd['package_dependencies'] as $pk)
+                    array_push($this->package_dependencies, new package_conf($pk));
+            }
 
 
         }
@@ -310,8 +319,10 @@ namespace dna\core {
          */
         public function addTag($tag)
         {
+            var_dump($this->package_tags);
             array_push($this->package_tags, $tag);
             $this->tagRegen();
+            var_dump($this->package_tags);
         }
 
         /**
@@ -394,6 +405,7 @@ namespace dna\core {
                 } else {
                     if ($def->package_owners != null) $bas->package_owners = $def->package_owners;
                 }
+
 
                 return $bas;
 
@@ -538,15 +550,15 @@ namespace dna\core {
         {
             /*
                 Search index : 1)
-                    Name: DNA-IO          Version: 1.0.0-DEV          By: Openspace42@GianfriAur         Author: Gianfrancesco Aurecchia
-                    UID: DAN-IO_1.0.0-Dev@Openspace42.GianfriAur      Copyright: © GianfriAur 2018
-                    Licence: require acceptance: YES|NO,  link:package_licenseUrl
-                    Tags:
-                    Description:
-                    release_note :
+                    Name: XX          Version: XX         By: XX@XX         Author: XX XX
+                    UID: XX_XX@XX.XX      Copyright: XX
+                    Licence: require acceptance: YES|NO,  link: XX
+                    Tags: XX
+                    Description: XX
+                    release_note : XX
              */
 
-            return "\tName: ".$this->package_name."          Version: ".$this->package_version."          By: ".$this->package_author_group."@".$this->package_author->author_nic ."         Author: ".$this->package_author->author_name ." ".$this->package_author->author_surname ."\n".
+            return  "\tName: ".$this->package_name."          Version: ".$this->package_version."          By: ".$this->package_author_group."@".$this->package_author->author_nic ."         Author: ".$this->package_author->author_name ." ".$this->package_author->author_surname ."\n".
                     "\tUID: ".$this->package_uid."      Copyright: ".$this->package_copyright."\n".
                     "\tLicence: require acceptance: ".($this->package_require_license_acceptance?"Yes":"No").",  link: ".$this->package_licenseUrl."\n".
                     "\tTags: ".$this->package_tag."\n".
@@ -595,7 +607,12 @@ namespace dna\core {
 
             if (isset($PkFrom->package_tag)) if ($PkFrom->package_tag !== "" && $PkTo->package_tag != "") {
                 foreach ($PkFrom->package_tags as $i => $v) {
-                    if (!in_array($v, $PkTo->package_tags, true)) return false;
+                    if (!in_array($v, $PkTo->package_tags, true)) {
+                        var_dump($PkTo->package_tags);
+                        var_dump($PkFrom->package_tags);
+                        return false;
+
+                    }
                 }
             }
 

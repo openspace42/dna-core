@@ -7,11 +7,11 @@ namespace dna\core\package_conf {
     require_once __DIR__ . "/dna_messages.php";
     require_once __DIR__ . "/network.php";
     require_once __DIR__ . "/node_conf.php";
+    require_once __DIR__ . "/ToolNodeSearch.php";
 
     use dna\core\fileSystem as FS;
     use dna\core as core;
-    use dna\core\network as NET;
-    use dna\core\node_conf as NC;
+    use dna\core\ToolNodeSearch as TS;
 
     class ToolAddDependencies
     {
@@ -45,7 +45,7 @@ namespace dna\core\package_conf {
             while ($in != "e" && $in != "exit") {
                 $ref = $this->filters->renderingFilter();
                 if ($ref !== "") new core\success("Filters: " . $ref);
-                new core\info("options: s) for search,  a) add node of filter,  import <search index>) to import a dependencies, h) display help, d) display,  e) to exit");
+                new core\info("options: s) for search,  a) add node of filter,  i) to import a dependencies, h) display help, d) display,  e) to exit");
 
                 $in = FS::IO_get("option >", false);
 
@@ -71,12 +71,36 @@ namespace dna\core\package_conf {
                     case 'search':
                         $this->Search();
                         break;
+                    case 'i':
+                    case 'import':
+                        $this->IncludeDep();
+                        break;
                     default:
                         break;
                 }
             }
             if ($g) FS::writeAllPath($userDir . "/.dna/default_conf.json", $this->pkconf->simplify());
             else FS::writeAllPath($this->run_path . "/conf.json", $this->pkconf->simplify());
+        }
+
+        private function IncludeDep(){
+            if (count($this->Result)===0) new core\error("You must first do a search with results",false);
+            else {
+                $index = FS::IO_get("\trSearch index: ");
+                if (count($this->Result) < $index) new core\error("No result found in the result of search", false);
+                else {
+                    new core\warning("You're sure you want to import");
+                    new core\success($this->Result[$index - 1]->node_package_desc->renderingSearch());
+                    $rex = FS::IO_get("\t[y/yes/(empty) for yes | n/no/(other) for no]: ");
+                    if ($rex == "" or $rex == "y" or $rex = "yes") {
+                        array_push($this->pkconf->package_dependencies, $this->Result[$index - 1]->node_package_desc);
+                        new core\success ($this->Result[$index - 1]->node_package_desc->package_uid." added correctly");
+                    } else {
+                        new core\message( core\error::prepare("Import stopped"));
+                    }
+                }
+            }
+
         }
 
         private function AddNode()
@@ -254,46 +278,9 @@ namespace dna\core\package_conf {
         {
             $this->Result = array();
             $nodes = $this->pkconf->WithDefault()->package_node_extend;
-            $this->SearchEngine($nodes);
+            $this->Result= TS::SearchEngine($nodes,$this->filters,$this->Result);
         }
 
-        private function SearchEngine($listOfnode)
-        {
-            $nextStep = array();
-            /**
-             * @var node_extend $v
-             */
-            foreach ($listOfnode as $i => $v) {
-                if ($v->node_type == "http") {
-                    if (NET::URLIsValid($v->node_ref . "/dna-node.json")) {
-                        $node = new NC(NET::openJson($v->node_ref . "/dna-node.json"));
-                        foreach ($node->node_extend as $i => $v) {
-                            array_push($nextStep, $v);
-                        }
-                        $this->SearchEngineLiker($node->node_packages);
-                    } else {
-                        new core\error($v->node_ref . " skipped because don't have dna-node.json", false);
-                    }
-                } else if ($v->node_type === "file_system") {
 
-                }
-            }
-            if (count($nextStep) !== 0) {
-                $this->SearchEngine($nextStep);
-            }
-        }
-
-        private function SearchEngineLiker($node_packages)
-        {
-            /**
-             * @var NC\node_package $package
-             */
-            foreach ($node_packages as $i => $package) {
-                if ($this->filters->match($package->node_package_desc)) {
-                    array_push($this->Result, $package);
-                    new core\success("Search index : " . (count($this->Result)) . ") \n" . $package->node_package_desc->renderingSearch());
-                }
-            }
-        }
     }
 }
