@@ -7,8 +7,10 @@ namespace dna\core {
     require_once __DIR__ . "/fileSystem.php";
     require_once __DIR__ . "/package_conf.php";
     require_once __DIR__ . "/dna_conf.php";
+    require_once __DIR__ . "/dna_install.php";
 
     use dna\core as core;
+    use dna\core\fileSystem as FS;
 
     class dna
     {
@@ -58,7 +60,11 @@ namespace dna\core {
                 $args = array_slice($args, 1);
             }
             if ($op == "i") {
-                $this->install($buffer_args);
+                $Pkconf=new package_conf(FS::openJson("conf.json"));$Pkconf=$Pkconf->WithDefault();
+                new core\success($Pkconf->generateUID(),true);
+                new dna_install($this->run_path,$Pkconf,false,core\success::prepare("  ├─────▶"));
+                new core\success("──┘",true);
+               // $this->install($buffer_args);
             } else if ($op == "b") {
                 $this->build($buffer_args);
             } else if ($op == "r") {

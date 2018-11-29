@@ -3,9 +3,9 @@
 .directory
 dna.min
 conf.json
-DNA-IO_1.0.0-Dev@openspace42.GianfriAur.zip
-DNA-IO_1.0.0-Dev@openspace42.GianfriAur/
 conf.build.json
-dna-core.zip
 php7.2.5_openspace42_portable/
-
+Dependencies
+debug
+build
+program
