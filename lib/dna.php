@@ -8,6 +8,7 @@ namespace dna\core {
     require_once __DIR__ . "/package_conf.php";
     require_once __DIR__ . "/dna_conf.php";
     require_once __DIR__ . "/dna_install.php";
+    require_once __DIR__ ."/dna_compile.php";
 
     use dna\core as core;
     use dna\core\fileSystem as FS;
@@ -70,7 +71,8 @@ namespace dna\core {
             } else if ($op == "r") {
                 $this->run($buffer_args);
             } else if ($op == "c") {
-                $this->compile($buffer_args);
+               $Compiled = new dna_compile($this->run_path );
+               echo $Compiled->code;
             } else if ($op == "co") {
                 new dna_conf($buffer_args,$this->run_path );
             } else if ($op == "h") {
